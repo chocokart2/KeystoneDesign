@@ -1,16 +1,38 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
+public enum EItemEffect
+{
+    none = 0,
+
+    playerPowerup = 101,
+    playerPushEnemy = 102,
+
+    enemyPowerup = 201,
+    enemyHeavy = 202,
+    // 폭탄으로 인해 밀려나는것은 포함되지 않습니다.
+}
+
 public class PlayerController : MonoBehaviour
 {
+    private Coroutine currentCoroutine = null;
+    private EItemEffect myEffect = EItemEffect.none;
     private Rigidbody playerRb;
     private GameObject focalPoint;
     private float powerupStrength = 15.0f;
 
+
+    private Vector3 respawnPoint = new Vector3(0, 10, 0);
+    //private float playerDeathBottom = -10.0f;
+    private int remainLife = 0;
+
     public GameObject powerupIndicator;
     public float speed = 5.0f;
     public bool hasPowerup = false;
+
+
 
     // Start is called before the first frame update
     void Start()
@@ -30,6 +52,15 @@ public class PlayerController : MonoBehaviour
         piPosition.y = -0.5f;
         powerupIndicator.transform.position = piPosition;
     }
+    
+    public void AddLife()
+    {
+        remainLife++;
+    }
+    public void SetEffect(EItemEffect effect)
+    {
+        myEffect = effect;
+    }
 
     private void OnCollisionEnter(Collision collision)
     {
@@ -47,6 +78,7 @@ public class PlayerController : MonoBehaviour
     IEnumerator PowerupCountdownRoutine()
     {
         yield return new WaitForSeconds(7);
+        myEffect = EItemEffect.none;
         hasPowerup = false;
         powerupIndicator.SetActive(false);
     }
@@ -57,8 +89,22 @@ public class PlayerController : MonoBehaviour
         {
             hasPowerup = true;
             Destroy(other.gameObject);
-            StartCoroutine(PowerupCountdownRoutine());
+            if (currentCoroutine != null)
+            {
+                StopCoroutine(currentCoroutine);
+            }
+            currentCoroutine = StartCoroutine(PowerupCountdownRoutine());
             powerupIndicator.SetActive(true);
         }
+        if (other.CompareTag("DeathArea") && remainLife > 0)
+        {
+            transform.position = respawnPoint;
+            playerRb.angularVelocity = Vector3.zero;
+            playerRb.velocity = Vector3.zero;
+            remainLife--;
+        }
     }
+    // 플레이어의 각종 정보를 저장하는 변수
+    // 특정 이펙트를 담당하는 변수 + n초뒤 비활성화
+
 }
