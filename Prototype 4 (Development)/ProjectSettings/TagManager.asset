@@ -4,8 +4,12 @@
 TagManager:
   serializedVersion: 2
   tags:
-  - Powerup
   - Enemy
+  - DeBuff
+  - DeBuff2
+  - DeBuff3
+  - Buff
+  - Buff2
   layers:
   - Default
   - TransparentFX
