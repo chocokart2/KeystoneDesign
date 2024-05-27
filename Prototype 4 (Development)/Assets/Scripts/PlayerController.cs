@@ -1,17 +1,41 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
+public enum EItemEffect
+{
+    none = 0,
+
+    playerPowerup = 101,
+    playerPushEnemy = 102,
+
+    enemyPowerup = 201,
+    enemyHeavy = 202,
+    // í­íƒ„ìœ¼ë¡œ ì¸í•´ ë°€ë ¤ë‚˜ëŠ”ê²ƒì€ í¬í•¨ë˜ì§€ ì•ŠìŠµë‹ˆë‹¤.
+}
+
 public class PlayerController : MonoBehaviour
 {
+    private Coroutine currentCoroutine = null;
+    private EItemEffect myEffect = EItemEffect.none;
     private Rigidbody playerRb;
     private GameObject focalPoint;
-    public float speed = 5.0f;
-    public bool isBuffActive = false; // ¹öÇÁ »óÅÂ¸¦ ³ªÅ¸³»´Â º¯¼ö
-    public bool hasBuff2 = false; // ¹öÇÁ2 »óÅÂ¸¦ ³ªÅ¸³»´Â º¯¼ö
+    private float powerupStrength = 15.0f;
 
-    public Buff buff; // Buff ½ºÅ©¸³Æ® ÂüÁ¶ º¯¼ö
-    public Buff2 buff2; // Buff2 ½ºÅ©¸³Æ® ÂüÁ¶ º¯¼ö
+    private Vector3 respawnPoint = new Vector3(0, 10, 0);
+    //private float playerDeathBottom = -10.0f;
+    private int remainLife = 0;
+
+    public GameObject powerupIndicator;
+    public float speed = 5.0f;
+    public bool isBuffActive = false; // ë²„í”„ ìƒíƒœë¥¼ ë‚˜íƒ€ë‚´ëŠ” ë³€ìˆ˜
+    public bool hasBuff2 = false; // ë²„í”„2 ìƒíƒœë¥¼ ë‚˜íƒ€ë‚´ëŠ” ë³€ìˆ˜
+
+    public Buff buff; // Buff ìŠ¤í¬ë¦½íŠ¸ ì°¸ì¡° ë³€ìˆ˜
+    public Buff2 buff2; // Buff2 ìŠ¤í¬ë¦½íŠ¸ ì°¸ì¡° ë³€ìˆ˜
+
+
 
     // Start is called before the first frame update
     void Start()
@@ -19,7 +43,7 @@ public class PlayerController : MonoBehaviour
         playerRb = GetComponent<Rigidbody>();
         focalPoint = GameObject.Find("Focal Point");
 
-        // Buff ¹× Buff2 ½ºÅ©¸³Æ® ÃÊ±âÈ­
+        // Buff ë° Buff2 ìŠ¤í¬ë¦½íŠ¸ ì´ˆê¸°í™”
         buff = GetComponent<Buff>();
         buff2 = GetComponent<Buff2>();
     }
@@ -30,13 +54,13 @@ public class PlayerController : MonoBehaviour
         float forwardInput = Input.GetAxis("Vertical");
         playerRb.AddForce(focalPoint.transform.forward * forwardInput * speed);
 
-        // ÇÃ·¹ÀÌ¾î°¡ ³Ê¹« ¾Æ·¡·Î ¶³¾îÁ³À» ¶§
+        // í”Œë ˆì´ì–´ê°€ ë„ˆë¬´ ì•„ë˜ë¡œ ë–¨ì–´ì¡Œì„ ë•Œ
         if (transform.position.y < -10)
         {
             if (hasBuff2)
             {
                 RespawnPlayer();
-                hasBuff2 = false; // ÇÑ ¹ø ¸®½ºÆùµÇ¸é ¹öÇÁ2 »óÅÂ ÇØÁ¦
+                hasBuff2 = false; // í•œ ë²ˆ ë¦¬ìŠ¤í°ë˜ë©´ ë²„í”„2 ìƒíƒœ í•´ì œ
             }
             else
             {
@@ -44,8 +68,17 @@ public class PlayerController : MonoBehaviour
             }
         }
     }
+    
+    public void AddLife()
+    {
+        remainLife++;
+    }
+    public void SetEffect(EItemEffect effect)
+    {
+        myEffect = effect;
+    }
 
-    // µğ¹öÇÁ ¹× ¹öÇÁ ¾ÆÀÌÅÛ°ú Ãæµ¹ ½Ã Ã³¸®
+    // ë””ë²„í”„ ë° ë²„í”„ ì•„ì´í…œê³¼ ì¶©ëŒ ì‹œ ì²˜ë¦¬
     private void OnTriggerEnter(Collider other)
     {
         if (other.CompareTag("DeBuff"))
@@ -75,7 +108,7 @@ public class PlayerController : MonoBehaviour
         }
     }
 
-    // ÁÖº¯ÀÇ ¸ğµç ÀûÀÇ Rigidbody Å©±â¸¦ Áõ°¡½ÃÅ°´Â ÇÔ¼ö
+    // ì£¼ë³€ì˜ ëª¨ë“  ì ì˜ Rigidbody í¬ê¸°ë¥¼ ì¦ê°€ì‹œí‚¤ëŠ” í•¨ìˆ˜
     private void IncreaseRigidbodySizeForEnemies()
     {
         GameObject[] enemies = GameObject.FindGameObjectsWithTag("Enemy");
@@ -89,7 +122,7 @@ public class PlayerController : MonoBehaviour
         }
     }
 
-    // ÇÃ·¹ÀÌ¾î¸¦ ¹Ğ¾î³»´Â ÇÔ¼ö
+    // í”Œë ˆì´ì–´ë¥¼ ë°€ì–´ë‚´ëŠ” í•¨ìˆ˜
     private void PushPlayerAway(GameObject debuff3Object)
     {
         DeBuff3 deBuff3 = debuff3Object.GetComponent<DeBuff3>();
@@ -101,7 +134,7 @@ public class PlayerController : MonoBehaviour
         }
     }
 
-    // ¹öÇÁ¸¦ È°¼ºÈ­ÇÏ´Â ÇÔ¼ö
+    // ë²„í”„ë¥¼ í™œì„±í™”í•˜ëŠ” í•¨ìˆ˜
     private void ActivateBuff()
     {
         if (buff != null)
@@ -110,27 +143,34 @@ public class PlayerController : MonoBehaviour
         }
     }
 
-    // ¹öÇÁ2¸¦ È°¼ºÈ­ÇÏ´Â ÇÔ¼ö
+    // ë²„í”„2ë¥¼ í™œì„±í™”í•˜ëŠ” í•¨ìˆ˜
     private void ActivateBuff2()
     {
         if (buff2 != null)
         {
             buff2.ActivateBuff();
         }
+        if (other.CompareTag("DeathArea") && remainLife > 0)
+        {
+            transform.position = respawnPoint;
+            playerRb.angularVelocity = Vector3.zero;
+            playerRb.velocity = Vector3.zero;
+            remainLife--;
+        }
     }
-
-    // ¹öÇÁ2¸¦ ºñÈ°¼ºÈ­ÇÏ´Â ÇÔ¼ö
+    
+    // ë²„í”„2ë¥¼ ë¹„í™œì„±í™”í•˜ëŠ” í•¨ìˆ˜
     public void DeactivateBuff2()
     {
         hasBuff2 = false;
     }
 
-    // ÇÃ·¹ÀÌ¾î¸¦ ·£´ı À§Ä¡·Î ¸®½ºÆùÇÏ´Â ÇÔ¼ö
+    // í”Œë ˆì´ì–´ë¥¼ ëœë¤ ìœ„ì¹˜ë¡œ ë¦¬ìŠ¤í°í•˜ëŠ” í•¨ìˆ˜
     private void RespawnPlayer()
     {
         Vector3 spawnPosition = new Vector3(Random.Range(-9, 9), 0, Random.Range(-9, 9));
         transform.position = spawnPosition;
-        playerRb.velocity = Vector3.zero; // ¸®½ºÆù ½Ã ¼Óµµ ÃÊ±âÈ­
-        playerRb.angularVelocity = Vector3.zero; // ¸®½ºÆù ½Ã È¸Àü ¼Óµµ ÃÊ±âÈ­
+        playerRb.velocity = Vector3.zero; // ë¦¬ìŠ¤í° ì‹œ ì†ë„ ì´ˆê¸°í™”
+        playerRb.angularVelocity = Vector3.zero; // ë¦¬ìŠ¤í° ì‹œ íšŒì „ ì†ë„ ì´ˆê¸°í™”
     }
 }

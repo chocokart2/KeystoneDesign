@@ -4,6 +4,8 @@ using UnityEngine;
 public class Enemy : MonoBehaviour
 {
     public float speed = 3.0f;
+    public float chaseSpeed = 5.0f; // 추적 속도
+    public float chaseRange = 10.0f; // 추적 범위
     public float pushForce = 55.0f; // 밀어내는 힘
 
     private Rigidbody enemyRb;
@@ -23,6 +25,22 @@ public class Enemy : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
+        float distanceToPlayer = Vector3.Distance(transform.position, player.transform.position);
+
+        // 플레이어와의 거리가 일정 범위 안에 있는 경우 추적 속도로 이동
+        if (distanceToPlayer <= chaseRange)
+        {
+            Vector3 lookDirection = (player.transform.position - transform.position).normalized;
+            enemyRb.AddForce(lookDirection * chaseSpeed);
+        }
+        else
+        {
+            // 플레이어를 향해 이동 (기본 속도)
+            Vector3 lookDirection = (player.transform.position - transform.position).normalized;
+            enemyRb.AddForce(lookDirection * speed);
+        }
+        
+        // 플레이어의 버프 상태에 따른 밀어내기 로직
         if (playerController.isBuffActive)
         {
             float distanceToPlayer = Vector3.Distance(transform.position, player.transform.position);
@@ -46,7 +64,7 @@ public class Enemy : MonoBehaviour
             Vector3 lookDirection = (player.transform.position - transform.position).normalized;
             enemyRb.AddForce(lookDirection * speed);
         }
-
+        
         // 적이 너무 아래로 떨어지면 파괴
         if (transform.position.y < -10)
         {
