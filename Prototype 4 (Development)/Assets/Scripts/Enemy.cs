@@ -43,7 +43,6 @@ public class Enemy : MonoBehaviour
         // 플레이어의 버프 상태에 따른 밀어내기 로직
         if (playerController.isBuffActive)
         {
-            float distanceToPlayer = Vector3.Distance(transform.position, player.transform.position);
             if (distanceToPlayer < playerController.buff.safeDistance)
             {
                 // 플레이어로부터 밀어내는 방향 벡터 계산

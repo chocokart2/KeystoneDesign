@@ -1,4 +1,3 @@
-using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
@@ -106,6 +105,13 @@ public class PlayerController : MonoBehaviour
             Destroy(other.gameObject);
             ActivateBuff2();
         }
+        if (other.CompareTag("DeathArea") && remainLife > 0)
+        {
+            transform.position = respawnPoint;
+            playerRb.angularVelocity = Vector3.zero;
+            playerRb.velocity = Vector3.zero;
+            remainLife--;
+        }
     }
 
     // 주변의 모든 적의 Rigidbody 크기를 증가시키는 함수
@@ -150,13 +156,7 @@ public class PlayerController : MonoBehaviour
         {
             buff2.ActivateBuff();
         }
-        if (other.CompareTag("DeathArea") && remainLife > 0)
-        {
-            transform.position = respawnPoint;
-            playerRb.angularVelocity = Vector3.zero;
-            playerRb.velocity = Vector3.zero;
-            remainLife--;
-        }
+
     }
     
     // 버프2를 비활성화하는 함수
@@ -168,7 +168,7 @@ public class PlayerController : MonoBehaviour
     // 플레이어를 랜덤 위치로 리스폰하는 함수
     private void RespawnPlayer()
     {
-        Vector3 spawnPosition = new Vector3(Random.Range(-9, 9), 0, Random.Range(-9, 9));
+        Vector3 spawnPosition = new Vector3(UnityEngine.Random.Range(-9, 9), 0, UnityEngine.Random.Range(-9, 9));
         transform.position = spawnPosition;
         playerRb.velocity = Vector3.zero; // 리스폰 시 속도 초기화
         playerRb.angularVelocity = Vector3.zero; // 리스폰 시 회전 속도 초기화
