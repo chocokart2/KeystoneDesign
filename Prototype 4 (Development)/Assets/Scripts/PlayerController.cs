@@ -12,7 +12,7 @@ public enum EItemEffect
 
     enemyPowerup = 201,
     enemyHeavy = 202,
-    // ��ź���� ���� �з����°��� ���Ե��� �ʽ��ϴ�.
+    // 폭탄으로 인해 밀려나는것은 포함되지 않습니다.
 }
 
 public class PlayerController : MonoBehaviour
@@ -23,14 +23,17 @@ public class PlayerController : MonoBehaviour
     private GameObject focalPoint;
     private float powerupStrength = 15.0f;
 
-
     private Vector3 respawnPoint = new Vector3(0, 10, 0);
     //private float playerDeathBottom = -10.0f;
     private int remainLife = 0;
 
     public GameObject powerupIndicator;
     public float speed = 5.0f;
-    public bool hasPowerup = false;
+    public bool isBuffActive = false; // 버프 상태를 나타내는 변수
+    public bool hasBuff2 = false; // 버프2 상태를 나타내는 변수
+
+    public Buff buff; // Buff 스크립트 참조 변수
+    public Buff2 buff2; // Buff2 스크립트 참조 변수
 
 
 
@@ -39,18 +42,31 @@ public class PlayerController : MonoBehaviour
     {
         playerRb = GetComponent<Rigidbody>();
         focalPoint = GameObject.Find("Focal Point");
+
+        // Buff 및 Buff2 스크립트 초기화
+        buff = GetComponent<Buff>();
+        buff2 = GetComponent<Buff2>();
     }
 
     // Update is called once per frame
     void Update()
     {
         float forwardInput = Input.GetAxis("Vertical");
-
         playerRb.AddForce(focalPoint.transform.forward * forwardInput * speed);
 
-        Vector3 piPosition = transform.position;
-        piPosition.y = -0.5f;
-        powerupIndicator.transform.position = piPosition;
+        // 플레이어가 너무 아래로 떨어졌을 때
+        if (transform.position.y < -10)
+        {
+            if (hasBuff2)
+            {
+                RespawnPlayer();
+                hasBuff2 = false; // 한 번 리스폰되면 버프2 상태 해제
+            }
+            else
+            {
+                Destroy(gameObject);
+            }
+        }
     }
     
     public void AddLife()
@@ -62,39 +78,77 @@ public class PlayerController : MonoBehaviour
         myEffect = effect;
     }
 
-    private void OnCollisionEnter(Collision collision)
+    // 디버프 및 버프 아이템과 충돌 시 처리
+    private void OnTriggerEnter(Collider other)
     {
-        if (collision.gameObject.CompareTag("Enemy") && hasPowerup)
+        if (other.CompareTag("DeBuff"))
         {
-            Rigidbody enemyRigidbody = collision.gameObject.GetComponent<Rigidbody>();
-            Vector3 awayFromPlayer = (collision.transform.position - transform.position).normalized;
-
-            Debug.Log("Collided with " + collision.gameObject.name + " with powerup set to " + hasPowerup);
-
-            enemyRigidbody.AddForce(awayFromPlayer * powerupStrength, ForceMode.Impulse);
+            Destroy(other.gameObject);
+            IncreaseRigidbodySizeForEnemies();
+        }
+        else if (other.CompareTag("DeBuff2"))
+        {
+            Destroy(other.gameObject);
+            IncreaseRigidbodySizeForEnemies();
+        }
+        else if (other.CompareTag("DeBuff3"))
+        {
+            Destroy(other.gameObject);
+            PushPlayerAway(other.gameObject);
+        }
+        else if (other.CompareTag("Buff"))
+        {
+            Destroy(other.gameObject);
+            ActivateBuff();
+        }
+        else if (other.CompareTag("Buff2"))
+        {
+            Destroy(other.gameObject);
+            ActivateBuff2();
         }
     }
 
-    IEnumerator PowerupCountdownRoutine()
+    // 주변의 모든 적의 Rigidbody 크기를 증가시키는 함수
+    private void IncreaseRigidbodySizeForEnemies()
     {
-        yield return new WaitForSeconds(7);
-        myEffect = EItemEffect.none;
-        hasPowerup = false;
-        powerupIndicator.SetActive(false);
+        GameObject[] enemies = GameObject.FindGameObjectsWithTag("Enemy");
+        foreach (GameObject enemy in enemies)
+        {
+            DeBuff2 deBuff2 = enemy.GetComponent<DeBuff2>();
+            if (deBuff2 != null)
+            {
+                deBuff2.IncreaseRigidbodySize();
+            }
+        }
     }
 
-    private void OnTriggerEnter(Collider other)
+    // 플레이어를 밀어내는 함수
+    private void PushPlayerAway(GameObject debuff3Object)
     {
-        if (other.CompareTag("Powerup"))
+        DeBuff3 deBuff3 = debuff3Object.GetComponent<DeBuff3>();
+        if (deBuff3 != null)
         {
-            hasPowerup = true;
-            Destroy(other.gameObject);
-            if (currentCoroutine != null)
-            {
-                StopCoroutine(currentCoroutine);
-            }
-            currentCoroutine = StartCoroutine(PowerupCountdownRoutine());
-            powerupIndicator.SetActive(true);
+            Vector3 awayFromObject = (transform.position - debuff3Object.transform.position).normalized;
+            playerRb.AddForce(awayFromObject * deBuff3.pushStrength, ForceMode.Impulse);
+            Debug.Log("Player pushed away from " + debuff3Object.name);
+        }
+    }
+
+    // 버프를 활성화하는 함수
+    private void ActivateBuff()
+    {
+        if (buff != null)
+        {
+            buff.ActivateBuff();
+        }
+    }
+
+    // 버프2를 활성화하는 함수
+    private void ActivateBuff2()
+    {
+        if (buff2 != null)
+        {
+            buff2.ActivateBuff();
         }
         if (other.CompareTag("DeathArea") && remainLife > 0)
         {
@@ -104,7 +158,19 @@ public class PlayerController : MonoBehaviour
             remainLife--;
         }
     }
-    // �÷��̾��� ���� ������ �����ϴ� ����
-    // Ư�� ����Ʈ�� ����ϴ� ���� + n�ʵ� ��Ȱ��ȭ
+    
+    // 버프2를 비활성화하는 함수
+    public void DeactivateBuff2()
+    {
+        hasBuff2 = false;
+    }
 
+    // 플레이어를 랜덤 위치로 리스폰하는 함수
+    private void RespawnPlayer()
+    {
+        Vector3 spawnPosition = new Vector3(Random.Range(-9, 9), 0, Random.Range(-9, 9));
+        transform.position = spawnPosition;
+        playerRb.velocity = Vector3.zero; // 리스폰 시 속도 초기화
+        playerRb.angularVelocity = Vector3.zero; // 리스폰 시 회전 속도 초기화
+    }
 }

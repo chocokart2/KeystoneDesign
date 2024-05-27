@@ -39,10 +39,11 @@ public class Enemy : MonoBehaviour
             Vector3 lookDirection = (player.transform.position - transform.position).normalized;
             enemyRb.AddForce(lookDirection * speed);
         }
-
+        
         // 플레이어의 버프 상태에 따른 밀어내기 로직
         if (playerController.isBuffActive)
         {
+            float distanceToPlayer = Vector3.Distance(transform.position, player.transform.position);
             if (distanceToPlayer < playerController.buff.safeDistance)
             {
                 // 플레이어로부터 밀어내는 방향 벡터 계산
@@ -50,8 +51,20 @@ public class Enemy : MonoBehaviour
                 // 적을 밀어내는 힘을 추가
                 enemyRb.AddForce(directionAwayFromPlayer * pushForce, ForceMode.Impulse);
             }
+            else
+            {
+                // 플레이어를 향해 이동
+                Vector3 lookDirection = (player.transform.position - transform.position).normalized;
+                enemyRb.AddForce(lookDirection * speed);
+            }
         }
-
+        else
+        {
+            // 플레이어를 향해 이동
+            Vector3 lookDirection = (player.transform.position - transform.position).normalized;
+            enemyRb.AddForce(lookDirection * speed);
+        }
+        
         // 적이 너무 아래로 떨어지면 파괴
         if (transform.position.y < -10)
         {
