@@ -1,7 +1,7 @@
 using System.Collections;
 using UnityEngine;
 
-public class Buff2 : MonoBehaviour
+public class Buff2 : EffectBase
 {
     private PlayerController playerController;
 
@@ -10,8 +10,8 @@ public class Buff2 : MonoBehaviour
         playerController = GameObject.Find("Player").GetComponent<PlayerController>();
     }
 
-    public void ActivateBuff()
-    {
-        playerController.hasBuff2 = true;
-    }
+    //public void ActivateBuff()
+    //{
+    //    playerController.hasBuff2 = true;
+    //}
 }

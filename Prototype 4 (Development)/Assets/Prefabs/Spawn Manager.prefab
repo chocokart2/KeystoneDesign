@@ -11,6 +11,11 @@ GameObject:
   - component: {fileID: 8160970856900977646}
   - component: {fileID: 7976930149669006211}
   - component: {fileID: 5562047644657995164}
+  - component: {fileID: 8942913358458527553}
+  - component: {fileID: 609653634887087658}
+  - component: {fileID: -8813949084718730420}
+  - component: {fileID: 5653715211205935715}
+  - component: {fileID: -2319180257095954436}
   m_Layer: 0
   m_Name: Spawn Manager
   m_TagString: Untagged
@@ -65,3 +70,82 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 40f00d7c7e6229f4aa3314aed1211610, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  playerPushing: {fileID: 0}
+  playerRevive: {fileID: 0}
+  enemyKnockbackHard: {fileID: 0}
+  enemyHeavy: {fileID: 0}
+--- !u!114 &8942913358458527553
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 721395346129906266}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 26150b735817c074e949a8df3478d0cd, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  isEffectActivated: 0
+  endTime: 7
+  myEffects: 0
+  effectDuration: 15
+  safeDistance: 5
+--- !u!114 &609653634887087658
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 721395346129906266}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 0a167a96e08b7834682430ec3c853441, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  isEffectActivated: 0
+  endTime: 6000
+  myEffects: 0
+--- !u!114 &-8813949084718730420
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 721395346129906266}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 6ab68ffc5a165634a958651e50bfe722, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  isEffectActivated: 0
+  endTime: 10
+  myEffects: 0
+--- !u!114 &5653715211205935715
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 721395346129906266}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: b1fd0442d63e84b4da6a181d1d2bc0e9, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  isEffectActivated: 0
+  endTime: 10
+  myEffects: 0
+--- !u!114 &-2319180257095954436
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 721395346129906266}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: ce5c18a9718557a48b6048c7ac78d6e5, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  pushStrength: 10
