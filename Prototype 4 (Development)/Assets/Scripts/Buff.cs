@@ -2,27 +2,32 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class Buff : MonoBehaviour
+public class Buff : EffectBase
 {
     public float effectDuration = 15.0f; // 버프 효과 지속 시간
     public float safeDistance = 50.0f; // 플레이어와 적 사이의 최소 거리
 
-    private PlayerController playerController;
+    //private PlayerController playerController;
 
-    private void Start()
+    private void Awake()
     {
-        playerController = GameObject.Find("Player").GetComponent<PlayerController>();
+        endTime = effectDuration;
     }
 
-    public void ActivateBuff()
-    {
-        StartCoroutine(BuffCountdownRoutine());
-    }
+    //private void Start()
+    //{
+    //    //playerController = GameObject.Find("Player").GetComponent<PlayerController>();
+    //}
 
-    private IEnumerator BuffCountdownRoutine()
-    {
-        playerController.isBuffActive = true;
-        yield return new WaitForSeconds(effectDuration);
-        playerController.isBuffActive = false;
-    }
+    //public void ActivateBuff()
+    //{
+    //    StartCoroutine(BuffCountdownRoutine());
+    //}
+
+    //private IEnumerator BuffCountdownRoutine()
+    //{
+    //    playerController.isBuffActive = true;
+    //    yield return new WaitForSeconds(effectDuration);
+    //    playerController.isBuffActive = false;
+    //}
 }
