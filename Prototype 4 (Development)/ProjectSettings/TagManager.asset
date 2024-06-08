@@ -11,6 +11,8 @@ TagManager:
   - DeBuff3
   - Buff
   - Buff2
+  - IslandA
+  - IslandB
   layers:
   - Default
   - TransparentFX
