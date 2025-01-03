@@ -99,7 +99,7 @@ public class BossEnemySkill : MonoBehaviour
         {
             Rigidbody playerRigidbody = collision.collider.GetComponent<Rigidbody>();
             myRigidbody.mass = Mathf.Max(
-                myRigidbody.mass - playerRigidbody.velocity.magnitude,
+                myRigidbody.mass - playerRigidbody.velocity.magnitude * 30,
                 1.0f);
         }
     }

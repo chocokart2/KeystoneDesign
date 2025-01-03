@@ -72,6 +72,7 @@ public class PlayerController : MonoBehaviour
     public void AddLife()
     {
         remainLife++;
+        effectManager.playerRevive.ActiveEffect();
     }
     public void SetEffect(EItemEffect effect)
     {
